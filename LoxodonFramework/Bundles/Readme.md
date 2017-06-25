@@ -80,6 +80,8 @@ Android
 ```
 ## Simulation mode in the editor
 
+![](Resources/menu.png)
+
 ```C#
     void Awake()
     {
