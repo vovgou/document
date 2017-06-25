@@ -1,6 +1,6 @@
 # Loxodon Framework Bundle
 
-[![release](https://img.shields.io/badge/release-v1.0.0-blue.svg)](https://github.com/Tencent/xLua/releases)
+[![release](https://img.shields.io/badge/release-v1.0.0-blue.svg)](https://www.assetstore.unity3d.com/#!/content/87419)
 
 **AssetBundle Manager for Unity3D**
 
