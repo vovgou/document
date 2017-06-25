@@ -79,6 +79,7 @@ Android
     }
 ```
 ## Simulation mode in the editor
+- In the editor,you can enable the simulation mode of the loading.Loads assets without having to build AssetBundle.
 
 ![](Resources/menu.png)
 
