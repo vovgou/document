@@ -39,7 +39,8 @@ Android
         IBundleManifestLoader manifestLoader = new BundleManifestLoader();
 
         /* Loads BundleManifest. */
-        BundleManifest manifest = manifestLoader.Load(BundleUtil.GetReadOnlyDirectory() + BundleSetting.ManifestFilename);
+        BundleManifest manifest = manifestLoader.Load(BundleUtil.GetReadOnlyDirectory() 
+		+ BundleSetting.ManifestFilename);
 
         /* Create a PathInfoParser. */
         IPathInfoParser pathInfoParser = new AutoMappingPathInfoParser(manifest);
@@ -79,6 +80,7 @@ Android
 ```
 
 ## PathInfoParser
+
     PathInfoParser 是将资源的path解析成BundleName和AssetName的工具。我提供了两种类型的PathInfoParser，当然您也可以使用自己的PathInfoParser，只要实现IPathInfoParser接口就可以自定义PathInfoParser。
 
 	注意：所有的AssetName都是相对于根目录Assets的相对路径。如：Assets/Characters/MonkeyKing.prefab的AssetName即为Characters/MonkeyKing.prefab
