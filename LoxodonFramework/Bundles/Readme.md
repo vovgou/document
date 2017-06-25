@@ -208,62 +208,41 @@ public class CustomBundleLoaderBuilder : AbstractLoaderBuilder
 ## Custom BundleLoader
 
 ```C#
-public class UnityWebRequestBundleLoaderBuilder : AbstractLoaderBuilder
+public class CustomBundleLoader : BundleLoader
+{
+    public CustomBundleLoader(Uri uri, BundleInfo bundleInfo, BundleLoader[] dependencies, BundleManager manager) : base(uri, bundleInfo, dependencies, manager)
     {
-        public UnityWebRequestBundleLoaderBuilder(System.Uri baseUri) : base(baseUri)
-        {
-        }
-
-        public override BundleLoader Create(BundleManager manager, BundleInfo bundleInfo, BundleLoader[] dependencies)
-        {
-            return new UnityWebRequestBundleLoader(new System.Uri(this.BaseUri , bundleInfo.Filename), bundleInfo, dependencies, manager);
-        }
     }
 
-    public class UnityWebRequestBundleLoader : BundleLoader
+    protected override IEnumerator DoLoadAssetBundle(IProgressPromise<float, AssetBundle> promise)
     {
-        public UnityWebRequestBundleLoader(System.Uri uri, BundleInfo bundleInfo, BundleLoader[] dependencies, BundleManager manager) : base(uri, bundleInfo, dependencies, manager)
+        string path = this.GetAbsoluteUri();
+        using (WWW www = new WWW(path))
         {
-        }
-
-        protected override IEnumerator DoLoadAssetBundle(IProgressPromise<float, AssetBundle> promise)
-        {
-            if (this.BundleInfo.IsEncrypted)
+            while (!www.isDone)
             {
-                promise.UpdateProgress(0f);
-                promise.SetException(new System.NotSupportedException(string.Format("The data of the AssetBundle named '{0}' is encrypted,use the CryptographBundleLoader to load,please.", this.BundleInfo.Name)));
+                promise.UpdateProgress(www.progress);
+                yield return null;
+            }
+
+            if (!string.IsNullOrEmpty(www.error))
+            {
+                promise.SetException(new Exception(string.Format("Failed to load the AssetBundle '{0}' at the address '{1}'.Error:{2}", this.BundleInfo.Name, path, www.error)));
                 yield break;
             }
 
-            string path = this.GetAbsoluteUri();
-            using (UnityWebRequest www = UnityWebRequest.GetAssetBundle(path, this.BundleInfo.Hash, this.BundleInfo.CRC))
+            var assetBundle = www.assetBundle;
+            if (assetBundle == null)
             {
-                www.Send();
-                while (!www.isDone)
-                {
-                    promise.UpdateProgress(www.downloadProgress);
-                    yield return null;
-                }
-
-                if (!string.IsNullOrEmpty(www.error))
-                {
-                    promise.SetException(new Exception(string.Format("Failed to load the AssetBundle '{0}' at the address '{1}'.Error:{2}", this.BundleInfo.Name, path, www.error)));
-                    yield break;
-                }
-
-                DownloadHandlerAssetBundle handler = (DownloadHandlerAssetBundle)www.downloadHandler;
-                var assetBundle = handler.assetBundle;
-                if (assetBundle == null)
-                {
-                    promise.SetException(new Exception(string.Format("Failed to load the AssetBundle '{0}' at the address '{1}'.", this.BundleInfo.Name, path)));
-                    yield break;
-                }
-
-                promise.UpdateProgress(1f);
-                promise.SetResult(assetBundle);
+                promise.SetException(new Exception(string.Format("Failed to load the AssetBundle '{0}' at the address '{1}'.", this.BundleInfo.Name, path)));
+                yield break;
             }
+
+            promise.UpdateProgress(1f);
+            promise.SetResult(assetBundle);
         }
     }
+}
 ```
 
 ## Build AssetBundle
