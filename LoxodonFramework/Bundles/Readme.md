@@ -27,6 +27,8 @@ Android
 - Asset的加载;
 - AssetBundle下载;
 - AssetBundle 在编辑器模拟加载    
+- AssetBundle 加密
+- AssetBundle Build
 
 ## Quick start
 
@@ -208,7 +210,7 @@ public class CustomBundleLoaderBuilder : AbstractLoaderBuilder
     }
 ```
 
-## AssetBundle Build
+## Build AssetBundle
 Build AssetBundle,you can open a Editor window in menu: Tools/Loxodon/Build AssetBundle
 
 ![](Resources/BuildAssetBundle.png)
