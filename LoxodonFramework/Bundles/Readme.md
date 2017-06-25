@@ -205,6 +205,67 @@ public class CustomBundleLoaderBuilder : AbstractLoaderBuilder
     }
 ```
 
+## Custom BundleLoader
+
+```C#
+public class UnityWebRequestBundleLoaderBuilder : AbstractLoaderBuilder
+    {
+        public UnityWebRequestBundleLoaderBuilder(System.Uri baseUri) : base(baseUri)
+        {
+        }
+
+        public override BundleLoader Create(BundleManager manager, BundleInfo bundleInfo, BundleLoader[] dependencies)
+        {
+            return new UnityWebRequestBundleLoader(new System.Uri(this.BaseUri , bundleInfo.Filename), bundleInfo, dependencies, manager);
+        }
+    }
+
+    public class UnityWebRequestBundleLoader : BundleLoader
+    {
+        public UnityWebRequestBundleLoader(System.Uri uri, BundleInfo bundleInfo, BundleLoader[] dependencies, BundleManager manager) : base(uri, bundleInfo, dependencies, manager)
+        {
+        }
+
+        protected override IEnumerator DoLoadAssetBundle(IProgressPromise<float, AssetBundle> promise)
+        {
+            if (this.BundleInfo.IsEncrypted)
+            {
+                promise.UpdateProgress(0f);
+                promise.SetException(new System.NotSupportedException(string.Format("The data of the AssetBundle named '{0}' is encrypted,use the CryptographBundleLoader to load,please.", this.BundleInfo.Name)));
+                yield break;
+            }
+
+            string path = this.GetAbsoluteUri();
+            using (UnityWebRequest www = UnityWebRequest.GetAssetBundle(path, this.BundleInfo.Hash, this.BundleInfo.CRC))
+            {
+                www.Send();
+                while (!www.isDone)
+                {
+                    promise.UpdateProgress(www.downloadProgress);
+                    yield return null;
+                }
+
+                if (!string.IsNullOrEmpty(www.error))
+                {
+                    promise.SetException(new Exception(string.Format("Failed to load the AssetBundle '{0}' at the address '{1}'.Error:{2}", this.BundleInfo.Name, path, www.error)));
+                    yield break;
+                }
+
+                DownloadHandlerAssetBundle handler = (DownloadHandlerAssetBundle)www.downloadHandler;
+                var assetBundle = handler.assetBundle;
+                if (assetBundle == null)
+                {
+                    promise.SetException(new Exception(string.Format("Failed to load the AssetBundle '{0}' at the address '{1}'.", this.BundleInfo.Name, path)));
+                    yield break;
+                }
+
+                promise.UpdateProgress(1f);
+                promise.SetResult(assetBundle);
+            }
+        }
+    }
+```
+
 ## Build AssetBundle
 Build AssetBundle,you can open a Editor window in menu: Tools/Loxodon/Build AssetBundle
 
