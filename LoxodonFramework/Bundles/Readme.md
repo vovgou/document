@@ -30,6 +30,12 @@ Android
 
 ## Quick start
 
+### Build AssetBundle
+Tools/Loxodon/Build AssetBundle
+
+
+
+### Simple example
 ```C#
     private IResources resources;
 
