@@ -1,5 +1,7 @@
 # Loxodon Framework Bundle
 
+[![release](https://img.shields.io/badge/release-v1.0.0-blue.svg)](https://github.com/Tencent/xLua/releases)
+
 **AssetBundle Manager for Unity3D**
 
 *Developed by Clark*
