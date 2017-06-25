@@ -33,7 +33,7 @@ Android
 ### Build AssetBundle
 Tools/Loxodon/Build AssetBundle
 
-
+![](Resources/BuildAssetBundle.png)
 
 ### Simple example
 ```C#
