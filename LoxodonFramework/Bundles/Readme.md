@@ -30,12 +30,6 @@ Android
 
 ## Quick start
 
-### Build AssetBundle
-Tools/Loxodon/Build AssetBundle
-
-![](Resources/BuildAssetBundle.png)
-
-### Simple example
 ```C#
     private IResources resources;
 
@@ -83,6 +77,40 @@ Tools/Loxodon/Build AssetBundle
         });
     }
 ```
+
+## PathInfoParser
+    PathInfoParser 是将资源的path解析成BundleName和AssetName的工具。我提供了两种类型的PathInfoParser，当然您也可以使用自己的PathInfoParser，只要实现IPathInfoParser接口就可以自定义PathInfoParser。
+
+	注意：所有的AssetName都是相对于根目录Assets的相对路径。如：Assets/Characters/MonkeyKing.prefab的AssetName即为Characters/MonkeyKing.prefab
+
+	a.SimplePathInfoParser
+
+		SimplePathInfoParser支持使用分隔符分隔BundleName和AssetName的方式来组织资源路径。
+		示例：
+
+		AssetBundle:characters.unity3d
+		Asset:Assets/Characters/MonkeyKing.prefab		
+		加载路径:characters@Characters/MonkeyKing.prefab (注：分隔符可以是@，也可以是其他字符)
+        
+        ```C#
+
+		SimplePathInfoParser parser = new SimplePathInfoParser(new string[]{"@"});	
+		resources.LoadAssetAsync<GameObject>("characters@Characters/MonkeyKing.prefab");
+        
+        ```
+		
+	b.AutoMappingPathInfoParser
+		
+		兼顾性能和便捷性，推荐使用AutoMappingPathInfoParser解析器。AutoMappingPathInfoParser会自动创建AssetName和BundleName的映射关系，通过AssetName可以自动找到对应的BundleName。
+		如上例子中，
+        
+		```C#
+        
+		BundleManifest manifest;
+		AutoMappingPathInfoParserparser = new AutoMappingPathInfoParser(manifest);
+		resources.LoadAssetAsync<GameObject>("Characters/MonkeyKing.prefab");
+        
+        ```
 
 ## Contact Us
 Email: [yangpc.china@gmail.com](mailto:yangpc.china@gmail.com) 
