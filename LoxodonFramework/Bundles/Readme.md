@@ -92,25 +92,85 @@ Android
 		Asset:Assets/Characters/MonkeyKing.prefab		
 		加载路径:characters@Characters/MonkeyKing.prefab (注：分隔符可以是@，也可以是其他字符)
         
-        ```C#
+```C#
 
 		SimplePathInfoParser parser = new SimplePathInfoParser(new string[]{"@"});	
 		resources.LoadAssetAsync<GameObject>("characters@Characters/MonkeyKing.prefab");
         
-        ```
+```
 		
 	b.AutoMappingPathInfoParser
 		
 		兼顾性能和便捷性，推荐使用AutoMappingPathInfoParser解析器。AutoMappingPathInfoParser会自动创建AssetName和BundleName的映射关系，通过AssetName可以自动找到对应的BundleName。
 		如上例子中，
         
-		```C#
+```C#
         
 		BundleManifest manifest;
 		AutoMappingPathInfoParserparser = new AutoMappingPathInfoParser(manifest);
 		resources.LoadAssetAsync<GameObject>("Characters/MonkeyKing.prefab");
         
-        ```
+```
+
+## Custom ILoaderBuilder
+
+```C#
+public class CustomBundleLoaderBuilder : AbstractLoaderBuilder
+    {
+        private bool useCache;
+        private IDecryptor decryptor;
+
+        public CustomBundleLoaderBuilder(Uri baseUri, bool useCache) : this(baseUri, useCache, null)
+        {
+        }
+
+        public CustomBundleLoaderBuilder(Uri baseUri, bool useCache, IDecryptor decryptor) : base(baseUri)
+        {
+            this.useCache = useCache;
+            this.decryptor = decryptor;
+        }
+
+        public override BundleLoader Create(BundleManager manager, BundleInfo bundleInfo, BundleLoader[] dependencies)
+        {
+            Uri loadBaseUri = this.BaseUri;
+            
+            if (this.useCache && BundleUtil.ExistsInCache(bundleInfo))
+            {
+                loadBaseUri = this.BaseUri;
+                return new WWWBundleLoader(new Uri(loadBaseUri, bundleInfo.Filename), bundleInfo, dependencies, manager, this.useCache);
+            }
+
+            if (BundleUtil.ExistsInStorableDirectory(bundleInfo))
+            {
+                /* Path: Application.persistentDataPath + "/bundles/" + bundleInfo.Filename  */
+
+                loadBaseUri = new Uri(BundleUtil.GetStorableDirectory());
+            }
+            else if (BundleUtil.ExistsInReadOnlyDirectory(bundleInfo))
+            {
+                /* Path: Application.streamingAssetsPath + "/bundles/" + bundleInfo.Filename */
+
+                loadBaseUri = new Uri(BundleUtil.GetReadOnlyDirectory());
+            }
+
+            if (bundleInfo.IsEncrypted)
+            {
+                if (this.decryptor != null && bundleInfo.Encoding.Equals(decryptor.AlgorithmName))
+                    return new CryptographBundleLoader(new Uri(loadBaseUri, bundleInfo.Filename), bundleInfo, dependencies, manager, decryptor);
+
+                throw new NotSupportedException(string.Format("Not support the encryption algorithm '{0}'.", bundleInfo.Encoding));
+            }
+
+            return new WWWBundleLoader(new Uri(loadBaseUri, bundleInfo.Filename), bundleInfo, dependencies, manager, this.useCache);
+        }
+    }
+```
+
+## AssetBundle Build
+Build AssetBundle,you can open a Editor window in menu: Tools/Loxodon/Build AssetBundle
+
+![](Resources/BuildAssetBundle.png)
+
 
 ## Contact Us
 Email: [yangpc.china@gmail.com](mailto:yangpc.china@gmail.com) 
