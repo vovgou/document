@@ -6,12 +6,7 @@
 
 Requires Unity 5.3.0 or higher.
 
-Loxodon Framework Bundle is a lightweight MVVM(Model-View-ViewModel) framework built specifically to target Unity3D.
-Databinding and localization are supported.It has a very flexible extensibility.It makes your game development faster and easier.
-
-For tutorials,examples and support,please see the project.You can also discuss the project in the Unity Forums.
-
-The Free version is compatible with MacOSX,Windows,Linux and Android.The Pro version is compatible with MacOSX,Windows,Linux,IOS and Android etc.Check out the Pro version if you want more platforms and full source code.
+Loxodon Framework Bundle is a AssetBundle manager.
 
 **Tested in Unity 3D on the following platforms:**  
 PC/Mac/Linux  
