@@ -78,6 +78,43 @@ Android
         });
     }
 ```
+## Simulation mode in the editor
+
+```C#
+    void Awake()
+    {
+#if UNITY_EDITOR
+        if (SimulationSetting.IsSimulationMode)
+        {
+            /* Create a PathInfoParser. */
+            //IPathInfoParser pathInfoParser = new SimplePathInfoParser("@");
+            IPathInfoParser pathInfoParser = new SimulationAutoMappingPathInfoParser();
+
+            /* Create a BundleManager */
+            IBundleManager manager = new SimulationBundleManager();
+
+            /* Create a BundleResources */
+            resources = new SimulationResources(pathInfoParser, manager);
+        }
+#endif
+    }
+
+    IEnumerator Start()
+    {
+        string path = "LoxodonFramework/BundleExamples/Models/Green/Green.prefab";
+        IProgressResult<float, GameObject> result = resources.LoadAssetAsync<GameObject>(path);
+        while (!result.IsDone)
+        {
+            Debug.LogFormat("Progress:{0}%", result.Progress * 100);
+            yield return null;
+        }
+
+        if (result.Exception != null)
+            yield break;
+
+        GameObject.Instantiate(result.Result);
+    }
+```
 
 ## PathInfoParser
 
