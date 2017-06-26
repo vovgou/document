@@ -38,13 +38,12 @@ Android
         IBundleManifestLoader manifestLoader = new BundleManifestLoader();
 
         /* Loads BundleManifest. */
-        BundleManifest manifest = manifestLoader.Load(BundleUtil.GetReadOnlyDirectory() 
-		+ BundleSetting.ManifestFilename);
+        BundleManifest manifest = manifestLoader.Load(BundleUtil.GetReadOnlyDirectory() + BundleSetting.ManifestFilename);
 
         /* Create a PathInfoParser. */
         IPathInfoParser pathInfoParser = new AutoMappingPathInfoParser(manifest);
 
-        /* Use a custom BundleLoaderBuilder */
+        /* Create a LoaderBuilder */
         ILoaderBuilder builder = new WWWComplexLoaderBuilder(new Uri(BundleUtil.GetReadOnlyDirectory()), false);
 
         /* Create a BundleManager */
@@ -70,10 +69,7 @@ Android
                     throw r.Exception;
                 GameObject.Instantiate(r.Result);
             }
-            catch (Exception e) 
-            { 
-                Debug.LogErrorFormat("Error:{0}", e);
-            }
+            catch (Exception e) { Debug.LogErrorFormat("Load failure.Error:{0}", e); }
         });
     }
 ```
