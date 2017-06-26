@@ -19,13 +19,11 @@ Android
 - [Loxodon Framework Bundle](https://www.assetstore.unity3d.com/#!/content/87419)
 
 ## Key Features:
-- AssetBundle 依赖关系管理;
-- AssetBundle 加载;
-- Asset的加载;
-- AssetBundle下载;
-- AssetBundle 在编辑器模拟加载    
-- AssetBundle 加密
-- AssetBundle Build
+- Build AssetBundle
+- Support encryption
+- Support simulation mode in the editor
+- Support the weak cache
+- Support dependency management
 
 ## Quick start
 
