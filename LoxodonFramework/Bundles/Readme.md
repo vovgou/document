@@ -124,6 +124,8 @@ Note：Assets directory is the root of all assets,so it is omitted.
 - SimplePathInfoParser example
 
 ```C#
+	//BundleName:characters or characters.*  
+	//AssetName:Assets/Characters/MonkeyKing.prefab
 	string path = "characters@Characters/MonkeyKing.prefab";
         BundleManifest manifest = ...
         ILoaderBuilder builder = ...
@@ -140,7 +142,8 @@ Note：Assets directory is the root of all assets,so it is omitted.
 	
 - AutoMappingPathInfoParser example
 
-```C#        
+```C#   
+	//AssetName:Assets/Characters/MonkeyKing.prefab
 	string path = "Characters/MonkeyKing.prefab";
         BundleManifest manifest = ...
         ILoaderBuilder builder = ...
