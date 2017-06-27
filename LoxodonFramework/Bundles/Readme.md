@@ -125,17 +125,29 @@ Note：Assets directory is the root of all assets,so it is omitted.
 
 ```C#
 	string path = "characters@Characters/MonkeyKing.prefab";
-	SimplePathInfoParser parser = new SimplePathInfoParser(new string[]{"@"});	
-	resources.LoadAssetAsync<GameObject>(path);        
+        SimplePathInfoParser parser = new SimplePathInfoParser(new string[] { "@" });
+        IProgressResult<float, GameObject> result = resources.LoadAssetAsync<GameObject>(path);
+        result.Callbackable().OnCallback((r) =>
+        {
+            if (r.Exception != null)
+                throw r.Exception;
+            GameObject.Instantiate(r.Result);
+        });
 ```
 	
 - AutoMappingPathInfoParser example
 
 ```C#        
 	BundleManifest manifest = ... ;
-	string path = "Characters/MonkeyKing.prefab";
-	AutoMappingPathInfoParserparser = new AutoMappingPathInfoParser(manifest);
-	resources.LoadAssetAsync<GameObject>(path);
+        string path = "Characters/MonkeyKing.prefab";
+        AutoMappingPathInfoParserparser = new AutoMappingPathInfoParser(manifest);        
+        IProgressResult<float, GameObject> result = resources.LoadAssetAsync<GameObject>(path);
+        result.Callbackable().OnCallback((r) =>
+        {
+            if (r.Exception != null)
+                throw r.Exception;
+            GameObject.Instantiate(r.Result);
+        });
 ```
 
 ## Custom ILoaderBuilder
