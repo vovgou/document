@@ -125,7 +125,10 @@ Note：Assets directory is the root of all assets,so it is omitted.
 
 ```C#
 	string path = "characters@Characters/MonkeyKing.prefab";
+        BundleManifest manifest = ...
+        ILoaderBuilder builder = ...
         SimplePathInfoParser parser = new SimplePathInfoParser(new string[] { "@" });
+        var resources = new BundleResources(parser, new BundleManager(manifest, builder));
         IProgressResult<float, GameObject> result = resources.LoadAssetAsync<GameObject>(path);
         result.Callbackable().OnCallback((r) =>
         {
@@ -138,9 +141,11 @@ Note：Assets directory is the root of all assets,so it is omitted.
 - AutoMappingPathInfoParser example
 
 ```C#        
-	BundleManifest manifest = ... ;
-        string path = "Characters/MonkeyKing.prefab";
-        AutoMappingPathInfoParserparser = new AutoMappingPathInfoParser(manifest);        
+	string path = "Characters/MonkeyKing.prefab";
+        BundleManifest manifest = ...
+        ILoaderBuilder builder = ...
+        AutoMappingPathInfoParserparser parser = new AutoMappingPathInfoParser(manifest);
+        var resources = new BundleResources(parser, new BundleManager(manifest, builder));
         IProgressResult<float, GameObject> result = resources.LoadAssetAsync<GameObject>(path);
         result.Callbackable().OnCallback((r) =>
         {
