@@ -1,17 +1,14 @@
 # Loxodon Framework Bundle
 
+[![release](https://img.shields.io/badge/release-v1.0.0-blue.svg)](https://www.assetstore.unity3d.com/#!/content/87419)
+
 **AssetBundle Manager for Unity3D**
 
 *Developed by Clark*
 
 Requires Unity 5.3.0 or higher.
 
-Loxodon Framework Bundle is a lightweight MVVM(Model-View-ViewModel) framework built specifically to target Unity3D.
-Databinding and localization are supported.It has a very flexible extensibility.It makes your game development faster and easier.
-
-For tutorials,examples and support,please see the project.You can also discuss the project in the Unity Forums.
-
-The Free version is compatible with MacOSX,Windows,Linux and Android.The Pro version is compatible with MacOSX,Windows,Linux,IOS and Android etc.Check out the Pro version if you want more platforms and full source code.
+Loxodon Framework Bundle is a AssetBundle manager.
 
 **Tested in Unity 3D on the following platforms:**  
 PC/Mac/Linux  
@@ -22,11 +19,11 @@ Android
 - [Loxodon Framework Bundle](https://www.assetstore.unity3d.com/#!/content/87419)
 
 ## Key Features:
-- AssetBundle 依赖关系管理;
-- AssetBundle 加载;
-- Asset的加载;
-- AssetBundle下载;
-- AssetBundle 在编辑器模拟加载    
+- Build AssetBundle
+- Support encryption
+- Support simulation mode in the editor
+- Support the weak cache
+- Support dependency management
 
 ## Quick start
 
@@ -39,13 +36,12 @@ Android
         IBundleManifestLoader manifestLoader = new BundleManifestLoader();
 
         /* Loads BundleManifest. */
-        BundleManifest manifest = manifestLoader.Load(BundleUtil.GetReadOnlyDirectory() 
-		+ BundleSetting.ManifestFilename);
+        BundleManifest manifest = manifestLoader.Load(BundleUtil.GetReadOnlyDirectory() + BundleSetting.ManifestFilename);
 
         /* Create a PathInfoParser. */
         IPathInfoParser pathInfoParser = new AutoMappingPathInfoParser(manifest);
 
-        /* Use a custom BundleLoaderBuilder */
+        /* Create a LoaderBuilder */
         ILoaderBuilder builder = new WWWComplexLoaderBuilder(new Uri(BundleUtil.GetReadOnlyDirectory()), false);
 
         /* Create a BundleManager */
@@ -71,14 +67,14 @@ Android
                     throw r.Exception;
                 GameObject.Instantiate(r.Result);
             }
-            catch (Exception e) 
-            { 
-                Debug.LogErrorFormat("Error:{0}", e);
-            }
+            catch (Exception e) { Debug.LogErrorFormat("Load failure.Error:{0}", e); }
         });
     }
 ```
 ## Simulation mode in the editor
+- In the editor,you can enable the simulation mode of the loading.Loads assets without having to build AssetBundle.
+
+![](Resources/menu.png)
 
 ```C#
     void Awake()
@@ -118,37 +114,45 @@ Android
 
 ## PathInfoParser
 
-    PathInfoParser 是将资源的path解析成BundleName和AssetName的工具。我提供了两种类型的PathInfoParser，当然您也可以使用自己的PathInfoParser，只要实现IPathInfoParser接口就可以自定义PathInfoParser。
+The PathInfoParser class is a path parser.
 
-	注意：所有的AssetName都是相对于根目录Assets的相对路径。如：Assets/Characters/MonkeyKing.prefab的AssetName即为Characters/MonkeyKing.prefab
+Note：Assets directory is the root of all assets,so it is omitted. 
 
-	a.SimplePathInfoParser
+	AssetBundle:characters.unity3d
+	Asset:Assets/Characters/MonkeyKing.prefab
+	
+- SimplePathInfoParser example
 
-		SimplePathInfoParser支持使用分隔符分隔BundleName和AssetName的方式来组织资源路径。
-		示例：
-
-		AssetBundle:characters.unity3d
-		Asset:Assets/Characters/MonkeyKing.prefab		
-		加载路径:characters@Characters/MonkeyKing.prefab (注：分隔符可以是@，也可以是其他字符)
-        
 ```C#
-
-		SimplePathInfoParser parser = new SimplePathInfoParser(new string[]{"@"});	
-		resources.LoadAssetAsync<GameObject>("characters@Characters/MonkeyKing.prefab");
-        
+	string path = "characters@Characters/MonkeyKing.prefab";
+        BundleManifest manifest = ...
+        ILoaderBuilder builder = ...
+        SimplePathInfoParser parser = new SimplePathInfoParser(new string[] { "@" });
+        var resources = new BundleResources(parser, new BundleManager(manifest, builder));
+        IProgressResult<float, GameObject> result = resources.LoadAssetAsync<GameObject>(path);
+        result.Callbackable().OnCallback((r) =>
+        {
+            if (r.Exception != null)
+                throw r.Exception;
+            GameObject.Instantiate(r.Result);
+        });
 ```
-		
-	b.AutoMappingPathInfoParser
-		
-		兼顾性能和便捷性，推荐使用AutoMappingPathInfoParser解析器。AutoMappingPathInfoParser会自动创建AssetName和BundleName的映射关系，通过AssetName可以自动找到对应的BundleName。
-		如上例子中，
-        
-```C#
-        
-		BundleManifest manifest;
-		AutoMappingPathInfoParserparser = new AutoMappingPathInfoParser(manifest);
-		resources.LoadAssetAsync<GameObject>("Characters/MonkeyKing.prefab");
-        
+	
+- AutoMappingPathInfoParser example
+
+```C#        
+	string path = "Characters/MonkeyKing.prefab";
+        BundleManifest manifest = ...
+        ILoaderBuilder builder = ...
+        AutoMappingPathInfoParserparser parser = new AutoMappingPathInfoParser(manifest);
+        var resources = new BundleResources(parser, new BundleManager(manifest, builder));
+        IProgressResult<float, GameObject> result = resources.LoadAssetAsync<GameObject>(path);
+        result.Callbackable().OnCallback((r) =>
+        {
+            if (r.Exception != null)
+                throw r.Exception;
+            GameObject.Instantiate(r.Result);
+        });
 ```
 
 ## Custom ILoaderBuilder
@@ -205,11 +209,54 @@ public class CustomBundleLoaderBuilder : AbstractLoaderBuilder
     }
 ```
 
-## AssetBundle Build
+## Custom BundleLoader
+
+```C#
+public class CustomBundleLoader : BundleLoader
+{
+    public CustomBundleLoader(Uri uri, BundleInfo bundleInfo, BundleLoader[] dependencies, BundleManager manager) : base(uri, bundleInfo, dependencies, manager)
+    {
+    }
+
+    protected override IEnumerator DoLoadAssetBundle(IProgressPromise<float, AssetBundle> promise)
+    {
+        string path = this.GetAbsoluteUri();
+        using (WWW www = new WWW(path))
+        {
+            while (!www.isDone)
+            {
+                promise.UpdateProgress(www.progress);
+                yield return null;
+            }
+
+            if (!string.IsNullOrEmpty(www.error))
+            {
+                promise.SetException(new Exception(string.Format("Failed to load the AssetBundle '{0}' at the address '{1}'.Error:{2}", this.BundleInfo.Name, path, www.error)));
+                yield break;
+            }
+
+            var assetBundle = www.assetBundle;
+            if (assetBundle == null)
+            {
+                promise.SetException(new Exception(string.Format("Failed to load the AssetBundle '{0}' at the address '{1}'.", this.BundleInfo.Name, path)));
+                yield break;
+            }
+
+            promise.UpdateProgress(1f);
+            promise.SetResult(assetBundle);
+        }
+    }
+}
+```
+
+## Build AssetBundle
 Build AssetBundle,you can open a Editor window in menu: Tools/Loxodon/Build AssetBundle
 
 ![](Resources/BuildAssetBundle.png)
 
+![](Resources/bundle_files.png)
+
+![](Resources/bundle_log.png)
 
 ## Contact Us
 Email: [yangpc.china@gmail.com](mailto:yangpc.china@gmail.com) 
