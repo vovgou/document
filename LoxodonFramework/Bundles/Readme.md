@@ -114,28 +114,28 @@ Android
 
 ## PathInfoParser
 
-    The PathInfoParser class is a path parser.
+The PathInfoParser class is a path parser.
 
-	Note：Assets directory is the root of all assets,so it is omitted. 
+Note：Assets directory is the root of all assets,so it is omitted. 
 
 	AssetBundle:characters.unity3d
 	Asset:Assets/Characters/MonkeyKing.prefab
 	
-	a.SimplePathInfoParser example
-        
+- SimplePathInfoParser example
+
 ```C#
-		string path = "characters@Characters/MonkeyKing.prefab";
-		SimplePathInfoParser parser = new SimplePathInfoParser(new string[]{"@"});	
-		resources.LoadAssetAsync<GameObject>(path);        
+	string path = "characters@Characters/MonkeyKing.prefab";
+	SimplePathInfoParser parser = new SimplePathInfoParser(new string[]{"@"});	
+	resources.LoadAssetAsync<GameObject>(path);        
 ```
-		
-	b.AutoMappingPathInfoParser
-        
+	
+- AutoMappingPathInfoParser example
+
 ```C#        
-		BundleManifest manifest = ... ;
-		string path = "Characters/MonkeyKing.prefab";
-		AutoMappingPathInfoParserparser = new AutoMappingPathInfoParser(manifest);
-		resources.LoadAssetAsync<GameObject>(path);
+	BundleManifest manifest = ... ;
+	string path = "Characters/MonkeyKing.prefab";
+	AutoMappingPathInfoParserparser = new AutoMappingPathInfoParser(manifest);
+	resources.LoadAssetAsync<GameObject>(path);
 ```
 
 ## Custom ILoaderBuilder
