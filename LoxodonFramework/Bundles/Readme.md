@@ -8,7 +8,7 @@
 
 Requires Unity 5.3.0 or higher.
 
-Loxodon Framework Bundle is a AssetBundle manager.
+Loxodon Framework Bundle is an AssetBundle manager.It provides a functionality that can automatically manage/load an AssetBundle,with its dependencies,from local or remote location.Asset Dependency Management including BundleManifest that keep track of every AssetBundle and all of their dependencies. An AssetBundle Simulation Mode, which allows for iterative testing of AssetBundles in a the Unity editor without ever building an AssetBundle.
 
 **Tested in Unity 3D on the following platforms:**  
 PC/Mac/Linux  
@@ -19,11 +19,9 @@ Android
 - [Loxodon Framework Bundle](https://www.assetstore.unity3d.com/#!/content/87419)
 
 ## Key Features:
-- Build AssetBundle
-- Support encryption
-- Support simulation mode in the editor
-- Support the weak cache
-- Support dependency management
+- Build AssetBundle.
+- Encrypts/decrypts the file data of the AssetBundle.
+- Support AssetBundle simulation mode.
 
 ## Quick start
 
