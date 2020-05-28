@@ -253,9 +253,10 @@ Build AssetBundle,you can open a Editor window in menu: Tools/Loxodon/Build Asse
 
 ![](Resources/BuildAssetBundle.png)
 
-gen: it is the working directory of the Unity packaging tool.
-1.0.0:it is the storage directory of Assetbundles, and its version is 1.0.0.
-bundles_1.0.0.csv:this is a csv file that stores summary information of all assetbundles.
+gen: it is the working directory of the Unity packaging tool. 
+1.0.0:it is the storage directory of Assetbundles, and its version is 1.0.0. 
+bundles_1.0.0.csv:this is a csv file that stores summary information of all assetbundles. 
+
 ![](Resources/bundle_files.png)
 
 ![](Resources/bundle_log.png)
